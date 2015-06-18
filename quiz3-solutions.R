@@ -98,7 +98,7 @@ question3 <- function(printme=TRUE) {
 
 }
 
-##question4 <- function() {
+question4 <- function() {
         ##What is the average GDP ranking for the "High income: OECD" and "High income: nonOECD" group?
         library(dplyr)
         mergeDF <- question3(printme=FALSE)
@@ -107,11 +107,19 @@ question3 <- function(printme=TRUE) {
         highIncomeDF <- group_by(highIncomeDF,Income.Group)
         print(summarize(highIncomeDF,Mean=mean(Ranking)))
         
-##}
+}
 
-question5 <- function() {
-        ##Cut the GDP ranking into 5 separate quantile groups. Make a table versus Income.Group. How many countries are Lower 
+##question5 <- function() {
+        ##Cut the GDP ranking into 5 separate quantile groups. Make a table versus Income.
+        ##Group. How many countries are Lower 
         ##middle income but among the 38 nations with highest GDP?
         
+        library(dplyr)
+        mergeDF <- question3(printme=FALSE)
+        ##add quantile column
+        mergeDF$USD.quantile <- cut(mergeDF$USD, breaks=quantile(mergeDF$USD,probs=c(0,.2,.4,.6,.8,1)))
+        mergeDF$USD.qnum <- factor(mergeDF$USD.quantile,labels=c("1st","2nd","3rd","4th","5th"))
+        ##print the table
+        print(table(mergeDF$USD.qnum, mergeDF$Income.Group))
         
-}
+##}
