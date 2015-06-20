@@ -4,7 +4,7 @@
 setwd("~/Documents/School/coursera/data science/getting and cleaning data/week 3/quiz")
 
 ##Question 1
-question1 <- function() {
+question1 <- function(printme = TRUE) {
         
         ##Create a logical vector that identifies the households on greater than 
         ##10 acres who sold more than $10,000 worth of agriculture products. Assign 
@@ -22,10 +22,13 @@ question1 <- function() {
         
         acs <- read.csv(destFile)
         acs$agricultureLogical <- ifelse(acs$ACR==3 & acs$AGS==6,TRUE,FALSE)
-        print(head(row.names(acs[which(acs$agricultureLogical),]),3))
+        
+        if(printme) {
+                print(head(row.names(acs[which(acs$agricultureLogical),]),3))
+        }else return(acs)
         
 }
-question2 <- function() {
+question2 <- function(printme = TRUE) {
         
         ##Using the jpeg package read in the following picture of your instructor into R.
         ##Use the parameter native=TRUE. What are the 30th and 80th quantiles of the resulting 
@@ -40,7 +43,9 @@ question2 <- function() {
         } 
         
         jpegArray <- readJPEG(destFile,native=TRUE)
-        print(quantile(jpegArray,probs=c(.3,.8)))
+        if(printme) {
+                print(quantile(jpegArray,probs=c(.3,.8)))
+        } else return(jpegArray)
         
 }
 
@@ -95,31 +100,44 @@ question3 <- function(printme=TRUE) {
                 print(mergeDF[13,"Economy"])
         }
         else return(mergeDF)
-
+        
 }
 
-question4 <- function() {
+question4 <- function(printme=TRUE) {
         ##What is the average GDP ranking for the "High income: OECD" and "High income: nonOECD" group?
         library(dplyr)
         mergeDF <- question3(printme=FALSE)
         
         highIncomeDF <- filter(mergeDF, (Income.Group=="High income: OECD" | Income.Group=="High income: nonOECD"))
         highIncomeDF <- group_by(highIncomeDF,Income.Group)
-        print(summarize(highIncomeDF,Mean=mean(Ranking)))
+        
+        if(printme) {
+                print(summarize(highIncomeDF,Mean=mean(Ranking)))
+        }
+        else return(mergeDF)
+        
         
 }
 
-##question5 <- function() {
+question5 <- function(printme=TRUE) {
         ##Cut the GDP ranking into 5 separate quantile groups. Make a table versus Income.
-        ##Group. How many countries are Lower 
-        ##middle income but among the 38 nations with highest GDP?
+        ##Group. How many countries are Lower middle income but among the 38 nations with highest GDP?
         
         library(dplyr)
         mergeDF <- question3(printme=FALSE)
         ##add quantile column
-        mergeDF$USD.quantile <- cut(mergeDF$USD, breaks=quantile(mergeDF$USD,probs=c(0,.2,.4,.6,.8,1)))
+        mergeDF$USD.quantile <- cut(mergeDF$USD, breaks=quantile(mergeDF$USD,probs=c(0,.2,.4,.6,.8,1)),include.lowest=TRUE)
         mergeDF$USD.qnum <- factor(mergeDF$USD.quantile,labels=c("1st","2nd","3rd","4th","5th"))
-        ##print the table
-        print(table(mergeDF$USD.qnum, mergeDF$Income.Group))
         
-##}
+        ##grap the LMI countries with GDP ranking less than 38.  Could use 5th quantile but the question specifically
+        ##asks for highest 38.
+        lmIncome38 <- filter(mergeDF, Ranking < 38 & Income.Group == "Lower middle income")
+        
+        if(printme) {
+                print(table(mergeDF$USD.qnum, mergeDF$Income.Group))
+                cat(sprintf("The following %d countries have a \"Lower middle income\" but are among the 38 highest GDP: \n\t%s", 
+                            nrow(lmIncome38), paste(lmIncome38$Long.Name,collapse="\n\t")))
+        } 
+        else return(mergeDF)
+        
+}
