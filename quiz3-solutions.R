@@ -131,7 +131,7 @@ question5 <- function(printme=TRUE) {
         
         ##grap the LMI countries with GDP ranking less than 38.  Could use 5th quantile but the question specifically
         ##asks for highest 38.
-        lmIncome38 <- filter(mergeDF, Ranking < 38 & Income.Group == "Lower middle income")
+        lmIncome38 <- filter(mergeDF, Ranking <= 38 & Income.Group == "Lower middle income")
         
         if(printme) {
                 print(table(mergeDF$USD.qnum, mergeDF$Income.Group))
